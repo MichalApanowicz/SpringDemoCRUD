@@ -8,9 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import pl.apanowicz.demoapp.DemoappApplicationTests;
-import pl.apanowicz.demoapp.domain.ProductFacade;
-import pl.apanowicz.demoapp.domain.ProductRequestDto;
-import pl.apanowicz.demoapp.domain.ProductResponseDto;
+import pl.apanowicz.demoapp.domain.*;
 
 
 import java.util.UUID;
@@ -37,7 +35,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldReturnStatus404WhenGetAndProductNotExist() {
         ProductRequestDto requestDto = new ProductRequestDto("product");
-        final String url = "http://localhost:" + this.port + "/api/v1/products/" + UUID.randomUUID();
+        final String url = "http://localhost:" + this.port + "/api/v1/products/fake_product";
 
         ResponseEntity<ProductResponseDto> result = httpClient.getForEntity(url, ProductResponseDto.class);
 
@@ -55,39 +53,36 @@ public class ProductEndpointTests extends DemoappApplicationTests {
                 ProductResponseDto.class
         );
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(result.getStatusCodeValue()).isEqualTo(201);
         assertThat(result.getBody().getName()).isEqualTo("nowyProdukt");
     }
 
     @Test
     public void shouldUpdateProduct() {
         final ProductRequestDto product = new ProductRequestDto("nowyProdukt");
-        String productJson = mapToJson(product);
-        ResponseEntity<ProductResponseDto> addResult = httpClient.postForEntity(
-                "http://localhost:" + this.port + "/api/v1/products/",
-                getHttpRequest(productJson),
-                ProductResponseDto.class
-        );
-
+        ProductResponseDto createdProduct = productFacade.create(product);
         final ProductRequestDto updatedProduct = new ProductRequestDto("zaktualizowanyProdukt");
         String updatedProductJson = mapToJson(updatedProduct);
+
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
-                "http://localhost:" + this.port + "/api/v1/products/" + addResult.getBody().getId(),
+                "http://localhost:" + this.port + "/api/v1/products/" + createdProduct.getId(),
                 HttpMethod.PUT,
                 getHttpRequest(updatedProductJson),
                 ProductResponseDto.class
         );
 
-        assertThat(updateResult.getStatusCodeValue()).isEqualTo(202);
+        assertThat(productFacade.get(createdProduct.getId()).getName())
+                .isEqualTo("zaktualizowanyProdukt");
+        assertThat(updateResult.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test
     public void shouldReturnStatus404WhenUpdateAndProductNotExist() {
         ProductRequestDto requestDto = new ProductRequestDto("product");
         final String url = "http://localhost:" + this.port + "/api/v1/products/" + UUID.randomUUID();
-
         final ProductRequestDto product = new ProductRequestDto("zaktualizowanyProdukt");
         String productJson = mapToJson(product);
+
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
                 url,
                 HttpMethod.PUT,
@@ -98,24 +93,20 @@ public class ProductEndpointTests extends DemoappApplicationTests {
         assertThat(updateResult.getStatusCodeValue()).isEqualTo(404);
     }
 
-    @Test
+    @Test(expected = ProductNotFoundException.class)
     public void shouldDeleteProduct() {
         final ProductRequestDto product = new ProductRequestDto("nowyProdukt");
-        String productJson = mapToJson(product);
-        ResponseEntity<ProductResponseDto> addResult = httpClient.postForEntity(
-                "http://localhost:" + this.port + "/api/v1/products/",
-                getHttpRequest(productJson),
-                ProductResponseDto.class
-        );
+        ProductResponseDto createdProduct = productFacade.create(product);
 
         ResponseEntity<ProductResponseDto> result = httpClient.exchange(
-                "http://localhost:" + this.port + "/api/v1/products/" + addResult.getBody().getId(),
+                "http://localhost:" + this.port + "/api/v1/products/" + createdProduct.getId(),
                 HttpMethod.DELETE,
                 null,
                 ProductResponseDto.class
         );
 
-        assertThat(result.getStatusCodeValue()).isEqualTo(202);
+        assertThat(result.getStatusCodeValue()).isEqualTo(204);
+        productFacade.get(createdProduct.getId());
     }
 
     @Test

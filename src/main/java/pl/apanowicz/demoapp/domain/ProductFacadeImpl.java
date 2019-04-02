@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
-public class ProductFacadeImpl implements ProductFacade {
+class ProductFacadeImpl implements ProductFacade {
 
 
     public final ProductRepository productRepository;
@@ -24,7 +24,7 @@ public class ProductFacadeImpl implements ProductFacade {
     @Override
     public ProductResponseDto create(ProductRequestDto productRequest){
         if (!productRequest.isValid()){
-            throw new RuntimeException("Product name cannot be empty!");
+            throw new ProductValidationException("Product name cannot be empty!");
         }
         String id = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
@@ -41,16 +41,20 @@ public class ProductFacadeImpl implements ProductFacade {
     public ProductResponseDto get(String id) throws ProductNotFoundException{
         Product product = productRepository.findById(id);
         if(product==null) {
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(id);
         }
         return new ProductResponseDto(product.getId(), product.getName());
     }
 
     @Override
     public ProductResponseDto update(String id, ProductRequestDto productRequest) throws ProductNotFoundException {
+        if (!productRequest.isValid()){
+            throw new ProductValidationException("Product name cannot be empty!");
+        }
+
         Product product = productRepository.findById(id);
         if(product==null) {
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(id);
         }
         Product updatedProduct = new Product(id, productRequest.getName(), product.getCreatedAt());
         productRepository.update(id, updatedProduct);
@@ -61,7 +65,7 @@ public class ProductFacadeImpl implements ProductFacade {
     public ProductResponseDto remove(String id) throws ProductNotFoundException {
         Product product = productRepository.findById(id);
         if(product==null) {
-            throw new ProductNotFoundException();
+            throw new ProductNotFoundException(id);
         }
 
         productRepository.removeById(id);

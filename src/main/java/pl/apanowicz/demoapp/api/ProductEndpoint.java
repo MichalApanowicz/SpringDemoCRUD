@@ -19,46 +19,31 @@ class ProductEndpoint {
     }
 
     @PostMapping
-    ProductResponseDto createProduct(@RequestBody ProductRequestDto productRequestDto){
-        return productFacade.create(productRequestDto);
+    ResponseEntity<ProductResponseDto> createProduct(@RequestBody ProductRequestDto productRequestDto) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productFacade.create(productRequestDto));
     }
 
     @GetMapping("/{id}")
-    ProductResponseDto getProduct(@PathVariable("id") String id){
-        try {
-            return productFacade.get(id);
-        }
-        catch (ProductNotFoundException ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Product not found", ex);
-        }
-
+    ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") String id) throws ProductNotFoundException{
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productFacade.get(id));
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Void> updateProduct(@PathVariable("id") String id, @RequestBody ProductRequestDto productRequest){
-        try {
-            productFacade.update(id, productRequest);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        }
-        catch (ProductNotFoundException ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Product not found", ex);
-        }
-
+    ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") String id, @RequestBody ProductRequestDto productRequest){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productFacade.update(id, productRequest));
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteProduct(@PathVariable("id") String id){
-        try {
-            productFacade.remove(id);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        }
-        catch (ProductNotFoundException ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Product not found", ex);
-        }
-
+        productFacade.remove(id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
-//@JSONCreator
