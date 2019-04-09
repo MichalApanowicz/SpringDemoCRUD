@@ -10,12 +10,22 @@ public final class Product {
     private final String name;
     private final LocalDateTime createdAt;
     private final Price price;
+    private final Image image;
 
-    public Product(String id, String name, Price price, LocalDateTime createdAt) {
+    public Product(String id, String name, Price price, Image image, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.image = image;
         this.createdAt = createdAt;
+    }
+
+    public Product(String id, LocalDateTime createdAt, ProductRequestDto request) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.name = request.getName();
+        this.price = request.getPrice();
+        this.image = request.getImage();
     }
 
     public String getId() {
@@ -32,6 +42,10 @@ public final class Product {
 
     public Price getPrice() {
         return price;
+    }
+
+    public Image getImage() {
+        return image;
     }
 
     @Override

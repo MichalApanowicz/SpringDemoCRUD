@@ -6,6 +6,7 @@ import pl.apanowicz.demoapp.infrastructure.ProductRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 class ProductFacadeImpl implements ProductFacade {
@@ -21,7 +22,7 @@ class ProductFacadeImpl implements ProductFacade {
     public ProductResponseDto create(ProductRequestDto productRequest){
         String id = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
-        Product product = new Product(id, productRequest.getName(), productRequest.getPrice(), createdAt);
+        Product product = new Product(id, createdAt, productRequest);
 
         productRepository.save(product);
 
@@ -32,7 +33,11 @@ class ProductFacadeImpl implements ProductFacade {
 
     @Override
     public ProductsResponseDto getAll(){
-        List<Product> products = productRepository.findAll();
+        List<ProductResponseDto> products = productRepository
+                .findAll()
+                .stream()
+                .map(x -> new ProductResponseDto(x))
+                .collect(Collectors.toList());
 
         return new ProductsResponseDto(products);
     }
@@ -52,8 +57,8 @@ class ProductFacadeImpl implements ProductFacade {
         if(product==null) {
             throw new ProductNotFoundException(id);
         }
-        Product updatedProduct = new Product(id, productRequest.getName(), productRequest.getPrice(), product.getCreatedAt());
-        productRepository.update(id, updatedProduct);
+        Product updatedProduct = new Product(id, product.getCreatedAt(), productRequest);
+        productRepository.update(updatedProduct);
         return new ProductResponseDto(updatedProduct);
     }
 

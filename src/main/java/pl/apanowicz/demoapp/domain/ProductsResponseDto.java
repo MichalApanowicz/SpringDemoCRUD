@@ -7,15 +7,14 @@ import java.util.List;
 
 public class ProductsResponseDto {
 
-    private final List<Product> products;
-
+    private final List<ProductResponseDto> products;
 
     @JsonCreator
-    public ProductsResponseDto(@JsonProperty("products") List<Product> products) {
+    public ProductsResponseDto(@JsonProperty("products") List<ProductResponseDto> products) {
         this.products = products;
     }
 
-    public List<Product> getProducts() {
+    public List<ProductResponseDto> getProducts() {
         return products;
     }
 

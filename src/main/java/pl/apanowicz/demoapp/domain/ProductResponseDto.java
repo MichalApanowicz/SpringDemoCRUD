@@ -8,20 +8,25 @@ public class ProductResponseDto {
     private final String id;
     private final String name;
     private final Price price;
+    private final Image image;
 
     @JsonCreator
     public ProductResponseDto(@JsonProperty("id") String id,
                               @JsonProperty("name") String name,
-                              @JsonProperty("price") Price price) {
+                              @JsonProperty("price") Price price,
+                              @JsonProperty("image") Image image) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.image = image;
     }
+
 
     public ProductResponseDto(Product product) {
         this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
+        this.image = product.getImage();
     }
 
     public String getId() {
@@ -36,4 +41,7 @@ public class ProductResponseDto {
         return price;
     }
 
+    public Image getImage() {
+        return image;
+    }
 }

@@ -25,6 +25,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     ProductFacade productFacade;
 
     private final Price samplePrice = new Price(100, Currency.PLN);
+    private final Image sampleImage= new Image("http://apanowi.cz/image1");
 
     @Test
     public void shouldGetExistingProduct() {
@@ -61,8 +62,6 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
         assertThat(result.getStatusCodeValue()).isEqualTo(201);
         assertThat(result.getBody().getName()).isEqualTo("nowyProdukt");
-        assertThat(result.getBody().getPrice().getAmount()).isEqualTo(samplePrice.getAmount());
-        assertThat(result.getBody().getPrice().getCurrency()).isEqualTo(samplePrice.getCurrency());
     }
 
     @Test
@@ -77,7 +76,22 @@ public class ProductEndpointTests extends DemoappApplicationTests {
         );
 
         assertThat(result.getStatusCodeValue()).isEqualTo(201);
-        assertThat(result.getBody().getName()).isEqualTo("nowyProdukt");
+        assertThat(result.getBody().getPrice()).isEqualTo(samplePrice);
+    }
+
+    @Test
+    public void shouldCreateProductWithImage() {
+        final ProductRequestDto product = new ProductRequestDto("nowyProdukt", samplePrice, sampleImage);
+        String productJson = mapToJson(product);
+
+        ResponseEntity<ProductResponseDto> result = httpClient.postForEntity(
+                "http://localhost:" + this.port + "/api/v1/products/",
+                getHttpRequest(productJson),
+                ProductResponseDto.class
+        );
+
+        assertThat(result.getStatusCodeValue()).isEqualTo(201);
+        assertThat(result.getBody().getImage()).isEqualTo(sampleImage);
     }
 
     @Test
@@ -101,23 +115,38 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test
     public void shouldUpdateProductPrice() {
-        final ProductRequestDto productRequest = new ProductRequestDto("nowyProdukt", samplePrice);
-        ProductResponseDto createdProduct = productFacade.create(productRequest);
-        final ProductRequestDto updatedProductRequest = new ProductRequestDto("nowyProdukt", new Price(200, Currency.EUR));
-        String updatedProductJson = mapToJson(updatedProductRequest);
+        ProductResponseDto createdProduct = productFacade.create(new ProductRequestDto("nowyProdukt", samplePrice));
+        Price newPrice = new Price(200, Currency.EUR);
+        final ProductRequestDto updatedProductRequest = new ProductRequestDto("nowyProdukt", newPrice);
 
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
                 "http://localhost:" + this.port + "/api/v1/products/" + createdProduct.getId(),
                 HttpMethod.PUT,
-                getHttpRequest(updatedProductJson),
+                getHttpRequest(mapToJson(updatedProductRequest)),
                 ProductResponseDto.class
         );
 
         ProductResponseDto updatedProduct = productFacade.get(createdProduct.getId());
-        assertThat(updatedProduct.getPrice().getAmount()).isEqualTo(200);
-        assertThat(updatedProduct.getPrice().getCurrency()).isEqualTo(Currency.EUR);
+        assertThat(updatedProduct.getPrice()).isEqualTo(newPrice);
         assertThat(updateResult.getStatusCodeValue()).isEqualTo(200);
+    }
 
+    @Test
+    public void shouldUpdateProductImage() {
+        ProductResponseDto createdProduct = productFacade.create(new ProductRequestDto("nowyProdukt", samplePrice));
+        Image newImage = new Image("https://apanowi.cz/xxx/100");
+        final ProductRequestDto updatedProductRequest = new ProductRequestDto("nowyProdukt", samplePrice, newImage);
+
+        ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
+                "http://localhost:" + this.port + "/api/v1/products/" + createdProduct.getId(),
+                HttpMethod.PUT,
+                getHttpRequest(mapToJson(updatedProductRequest)),
+                ProductResponseDto.class
+        );
+
+        ProductResponseDto updatedProduct = productFacade.get(createdProduct.getId());
+        assertThat(updatedProduct.getImage()).isEqualTo(newImage);
+        assertThat(updateResult.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test
@@ -175,7 +204,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
         ResponseEntity<ProductsResponseDto> getResult = httpClient.getForEntity(url, ProductsResponseDto.class);
 
-        List<Product> products = getResult.getBody().getProducts();
+        List<ProductResponseDto> products = getResult.getBody().getProducts();
         assertThat(products.size()).isEqualTo(1);
         assertThat(products.get(0).getName()).isEqualTo("nowy");
         assertThat(getResult.getStatusCodeValue()).isEqualTo(200);
@@ -187,7 +216,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
         ResponseEntity<ProductsResponseDto> getResult = httpClient.getForEntity(url, ProductsResponseDto.class);
 
-        List<Product> productsResult = getResult.getBody().getProducts();
+        List<ProductResponseDto> productsResult = getResult.getBody().getProducts();
         assertThat(productsResult.isEmpty()).isTrue();
         assertThat(getResult.getStatusCodeValue()).isEqualTo(200);
     }
