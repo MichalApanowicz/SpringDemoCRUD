@@ -9,10 +9,12 @@ public final class Product {
     private final String id;
     private final String name;
     private final LocalDateTime createdAt;
+    private final Price price;
 
-    public Product(String id, String name, LocalDateTime createdAt) {
+    public Product(String id, String name, Price price, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
+        this.price = price;
         this.createdAt = createdAt;
     }
 
@@ -28,6 +30,10 @@ public final class Product {
         return createdAt;
     }
 
+    public Price getPrice() {
+        return price;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -35,19 +41,21 @@ public final class Product {
         Product that = (Product) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
+                Objects.equals(price, that.price) &&
                 Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, createdAt);
+        return Objects.hash(id, name, price, createdAt);
     }
 
     @Override
     public String toString() {
-        return "ProductJava{" +
+        return "Product{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ", price='" + price.toString() + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
     }

@@ -19,16 +19,13 @@ class ProductFacadeImpl implements ProductFacade {
 
     @Override
     public ProductResponseDto create(ProductRequestDto productRequest){
-        if (!productRequest.isValid()){
-            throw new ProductValidationException("Product name cannot be empty!");
-        }
         String id = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
-        Product product = new Product(id, productRequest.getName(), createdAt);
+        Product product = new Product(id, productRequest.getName(), productRequest.getPrice(), createdAt);
 
         productRepository.save(product);
 
-        ProductResponseDto responseDto = new ProductResponseDto(product.getId(),product.getName());
+        ProductResponseDto responseDto = new ProductResponseDto(product);
 
         return responseDto;
     }
@@ -46,22 +43,18 @@ class ProductFacadeImpl implements ProductFacade {
         if(product==null) {
             throw new ProductNotFoundException(id);
         }
-        return new ProductResponseDto(product.getId(), product.getName());
+        return new ProductResponseDto(product);
     }
 
     @Override
     public ProductResponseDto update(String id, ProductRequestDto productRequest) throws ProductNotFoundException {
-        if (!productRequest.isValid()){
-            throw new ProductValidationException("Product name cannot be empty!");
-        }
-
         Product product = productRepository.findById(id);
         if(product==null) {
             throw new ProductNotFoundException(id);
         }
-        Product updatedProduct = new Product(id, productRequest.getName(), product.getCreatedAt());
+        Product updatedProduct = new Product(id, productRequest.getName(), productRequest.getPrice(), product.getCreatedAt());
         productRepository.update(id, updatedProduct);
-        return new ProductResponseDto(updatedProduct.getId(), updatedProduct.getName());
+        return new ProductResponseDto(updatedProduct);
     }
 
     @Override
@@ -72,7 +65,7 @@ class ProductFacadeImpl implements ProductFacade {
         }
 
         productRepository.removeById(id);
-        return new ProductResponseDto(product.getId(), product.getName());
+        return new ProductResponseDto(product);
     }
 
 

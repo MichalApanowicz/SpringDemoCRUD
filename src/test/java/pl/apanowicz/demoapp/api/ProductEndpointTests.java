@@ -24,9 +24,11 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Autowired
     ProductFacade productFacade;
 
+    private final Price samplePrice = new Price(100, Currency.PLN);
+
     @Test
     public void shouldGetExistingProduct() {
-        ProductRequestDto requestDto = new ProductRequestDto("product");
+        ProductRequestDto requestDto = new ProductRequestDto("product", samplePrice);
         ProductResponseDto existingProduct = productFacade.create(requestDto);
         final String url = "http://localhost:" + this.port + "/api/v1/products/" + existingProduct.getId();
 
@@ -38,7 +40,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test
     public void shouldReturnStatus404WhenGetAndProductNotExist() {
-        ProductRequestDto requestDto = new ProductRequestDto("product");
+        ProductRequestDto requestDto = new ProductRequestDto("product", samplePrice);
         final String url = "http://localhost:" + this.port + "/api/v1/products/fake_product";
 
         ResponseEntity<ProductResponseDto> result = httpClient.getForEntity(url, ProductResponseDto.class);
@@ -48,7 +50,24 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test
     public void shouldCreateProduct() {
-        final ProductRequestDto product = new ProductRequestDto("nowyProdukt");
+        final ProductRequestDto product = new ProductRequestDto("nowyProdukt", samplePrice);
+        String productJson = mapToJson(product);
+
+        ResponseEntity<ProductResponseDto> result = httpClient.postForEntity(
+                "http://localhost:" + this.port + "/api/v1/products/",
+                getHttpRequest(productJson),
+                ProductResponseDto.class
+        );
+
+        assertThat(result.getStatusCodeValue()).isEqualTo(201);
+        assertThat(result.getBody().getName()).isEqualTo("nowyProdukt");
+        assertThat(result.getBody().getPrice().getAmount()).isEqualTo(samplePrice.getAmount());
+        assertThat(result.getBody().getPrice().getCurrency()).isEqualTo(samplePrice.getCurrency());
+    }
+
+    @Test
+    public void shouldCreateProductWithPrice() {
+        final ProductRequestDto product = new ProductRequestDto("nowyProdukt", samplePrice);
         String productJson = mapToJson(product);
 
         ResponseEntity<ProductResponseDto> result = httpClient.postForEntity(
@@ -63,9 +82,9 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test
     public void shouldUpdateProduct() {
-        final ProductRequestDto product = new ProductRequestDto("nowyProdukt");
+        final ProductRequestDto product = new ProductRequestDto("nowyProdukt", samplePrice);
         ProductResponseDto createdProduct = productFacade.create(product);
-        final ProductRequestDto updatedProduct = new ProductRequestDto("zaktualizowanyProdukt");
+        final ProductRequestDto updatedProduct = new ProductRequestDto("zaktualizowanyProdukt", samplePrice);
         String updatedProductJson = mapToJson(updatedProduct);
 
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
@@ -81,10 +100,31 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     }
 
     @Test
+    public void shouldUpdateProductPrice() {
+        final ProductRequestDto productRequest = new ProductRequestDto("nowyProdukt", samplePrice);
+        ProductResponseDto createdProduct = productFacade.create(productRequest);
+        final ProductRequestDto updatedProductRequest = new ProductRequestDto("nowyProdukt", new Price(200, Currency.EUR));
+        String updatedProductJson = mapToJson(updatedProductRequest);
+
+        ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
+                "http://localhost:" + this.port + "/api/v1/products/" + createdProduct.getId(),
+                HttpMethod.PUT,
+                getHttpRequest(updatedProductJson),
+                ProductResponseDto.class
+        );
+
+        ProductResponseDto updatedProduct = productFacade.get(createdProduct.getId());
+        assertThat(updatedProduct.getPrice().getAmount()).isEqualTo(200);
+        assertThat(updatedProduct.getPrice().getCurrency()).isEqualTo(Currency.EUR);
+        assertThat(updateResult.getStatusCodeValue()).isEqualTo(200);
+
+    }
+
+    @Test
     public void shouldReturnStatus404WhenUpdateAndProductNotExist() {
-        ProductRequestDto requestDto = new ProductRequestDto("product");
+        ProductRequestDto requestDto = new ProductRequestDto("product", samplePrice);
         final String url = "http://localhost:" + this.port + "/api/v1/products/fake_product";
-        final ProductRequestDto product = new ProductRequestDto("zaktualizowanyProdukt");
+        final ProductRequestDto product = new ProductRequestDto("zaktualizowanyProdukt", samplePrice);
         String productJson = mapToJson(product);
 
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
@@ -99,7 +139,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test(expected = ProductNotFoundException.class)
     public void shouldDeleteProduct() {
-        final ProductRequestDto product = new ProductRequestDto("nowyProdukt");
+        final ProductRequestDto product = new ProductRequestDto("nowyProdukt", samplePrice);
         ProductResponseDto createdProduct = productFacade.create(product);
 
         ResponseEntity<ProductResponseDto> result = httpClient.exchange(
@@ -115,7 +155,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test
     public void shouldReturnStatus404WhenDeleteAndProductNotExist() {
-        ProductRequestDto requestDto = new ProductRequestDto("product");
+        ProductRequestDto requestDto = new ProductRequestDto("product", samplePrice);
         final String url = "http://localhost:" + this.port + "/api/v1/products/fake_product";
 
         ResponseEntity<ProductResponseDto> deleteResult = httpClient.exchange(
@@ -131,7 +171,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldReturnListWhenRepositoryNotEmpty() {
         final String url = "http://localhost:" + this.port + "/api/v1/products/";
-        productFacade.create(new ProductRequestDto("nowy"));
+        productFacade.create(new ProductRequestDto("nowy", samplePrice));
 
         ResponseEntity<ProductsResponseDto> getResult = httpClient.getForEntity(url, ProductsResponseDto.class);
 
