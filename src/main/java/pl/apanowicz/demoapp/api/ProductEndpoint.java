@@ -3,11 +3,7 @@ package pl.apanowicz.demoapp.api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import pl.apanowicz.demoapp.domain.ProductFacade;
-import pl.apanowicz.demoapp.domain.ProductNotFoundException;
-import pl.apanowicz.demoapp.domain.ProductRequestDto;
-import pl.apanowicz.demoapp.domain.ProductResponseDto;
+import pl.apanowicz.demoapp.domain.*;
 
 @RestController
 @RequestMapping("api/v1/products")
@@ -23,6 +19,13 @@ class ProductEndpoint {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(productFacade.create(productRequestDto));
+    }
+
+    @GetMapping
+    ResponseEntity<ProductsResponseDto> getAllProducts() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productFacade.getAll());
     }
 
     @GetMapping("/{id}")

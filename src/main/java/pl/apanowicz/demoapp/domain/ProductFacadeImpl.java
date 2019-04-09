@@ -1,14 +1,10 @@
 package pl.apanowicz.demoapp.domain;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import pl.apanowicz.demoapp.infrastructure.ProductRepository;
 
-import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -35,6 +31,13 @@ class ProductFacadeImpl implements ProductFacade {
         ProductResponseDto responseDto = new ProductResponseDto(product.getId(),product.getName());
 
         return responseDto;
+    }
+
+    @Override
+    public ProductsResponseDto getAll(){
+        List<Product> products = productRepository.findAll();
+
+        return new ProductsResponseDto(products);
     }
 
     @Override

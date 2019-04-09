@@ -5,6 +5,7 @@ import pl.apanowicz.demoapp.domain.Product;
 import pl.apanowicz.demoapp.domain.ProductResponseDto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -20,6 +21,11 @@ class InMemoryProductRepository implements ProductRepository{
     @Override
     public Product findById(String id) {
         return products.get(id);
+    }
+
+    @Override
+    public List<Product> findAll() {
+        return List.copyOf(products.values());
     }
 
     @Override

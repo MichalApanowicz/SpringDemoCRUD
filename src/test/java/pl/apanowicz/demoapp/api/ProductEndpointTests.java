@@ -7,14 +7,18 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import pl.apanowicz.demoapp.DemoappApplicationTests;
 import pl.apanowicz.demoapp.domain.*;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Autowired
@@ -79,7 +83,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldReturnStatus404WhenUpdateAndProductNotExist() {
         ProductRequestDto requestDto = new ProductRequestDto("product");
-        final String url = "http://localhost:" + this.port + "/api/v1/products/" + UUID.randomUUID();
+        final String url = "http://localhost:" + this.port + "/api/v1/products/fake_product";
         final ProductRequestDto product = new ProductRequestDto("zaktualizowanyProdukt");
         String productJson = mapToJson(product);
 
@@ -112,17 +116,42 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldReturnStatus404WhenDeleteAndProductNotExist() {
         ProductRequestDto requestDto = new ProductRequestDto("product");
-        final String url = "http://localhost:" + this.port + "/api/v1/products/" + UUID.randomUUID();
+        final String url = "http://localhost:" + this.port + "/api/v1/products/fake_product";
 
-        ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
+        ResponseEntity<ProductResponseDto> deleteResult = httpClient.exchange(
                 url,
                 HttpMethod.DELETE,
                 null,
                 ProductResponseDto.class
         );
 
-        assertThat(updateResult.getStatusCodeValue()).isEqualTo(404);
+        assertThat(deleteResult.getStatusCodeValue()).isEqualTo(404);
     }
+
+    @Test
+    public void shouldReturnListWhenRepositoryNotEmpty() {
+        final String url = "http://localhost:" + this.port + "/api/v1/products/";
+        productFacade.create(new ProductRequestDto("nowy"));
+
+        ResponseEntity<ProductsResponseDto> getResult = httpClient.getForEntity(url, ProductsResponseDto.class);
+
+        List<Product> products = getResult.getBody().getProducts();
+        assertThat(products.size()).isEqualTo(1);
+        assertThat(products.get(0).getName()).isEqualTo("nowy");
+        assertThat(getResult.getStatusCodeValue()).isEqualTo(200);
+    }
+
+    @Test
+    public void shouldReturnListWhenRepositoryIsEmpty() {
+        final String url = "http://localhost:" + this.port + "/api/v1/products/";
+
+        ResponseEntity<ProductsResponseDto> getResult = httpClient.getForEntity(url, ProductsResponseDto.class);
+
+        List<Product> productsResult = getResult.getBody().getProducts();
+        assertThat(productsResult.isEmpty()).isTrue();
+        assertThat(getResult.getStatusCodeValue()).isEqualTo(200);
+    }
+
 
     String mapToJson(ProductRequestDto product) {
         try {
