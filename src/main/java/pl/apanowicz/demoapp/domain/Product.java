@@ -1,6 +1,8 @@
 package pl.apanowicz.demoapp.domain;
 
 
+import pl.apanowicz.demoapp.dto.ProductRequestDto;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -24,8 +26,8 @@ public final class Product {
         this.id = id;
         this.createdAt = createdAt;
         this.name = request.getName();
-        this.price = request.getPrice();
-        this.image = request.getImage();
+        this.price = new Price(request.getPrice());
+        this.image = new Image(request.getImage());
     }
 
     public String getId() {
@@ -66,7 +68,7 @@ public final class Product {
 
     @Override
     public String toString() {
-        return "Product{" +
+        return "product{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", price='" + price.toString() + '\'' +

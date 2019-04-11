@@ -1,22 +1,21 @@
 package pl.apanowicz.demoapp.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import org.hibernate.validator.constraints.URL;
+import pl.apanowicz.demoapp.dto.ImageDto;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public final class Image {
 
-    @URL
-    @NotEmpty(message = "Url cannot be empty")
-    @NotNull(message = "Url cannot be null")
-    private final String url;
+    private String url;
 
-    @JsonCreator
     public Image(String url){
         this.url = url;
+    }
+
+    public Image(ImageDto image){
+        if(image != null){
+            this.url = image.getUrl();
+        }
     }
 
     public String getUrl(){
@@ -33,7 +32,7 @@ public final class Image {
 
     @Override
     public String toString() {
-        return "Image{" +
+        return "image{" +
                 "url='" + url + '\'' +
                 '}';
     }

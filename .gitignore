@@ -1,20 +1,23 @@
-build
+# Gradle
 .gradle
+
+# IDE
 .idea
-out
 *.iml
 *.ipr
 *.iws
+.settings
 .DS_Store
+
 # Compiled class file
 *.class
-build/*
+
 # Log file
 *.log
 
 # IDE files
 *.ctxt
-.idea/*
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -29,3 +32,8 @@ build/*
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# output
+out
+build
+bin

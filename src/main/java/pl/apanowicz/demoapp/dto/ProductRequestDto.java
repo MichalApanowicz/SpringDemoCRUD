@@ -1,4 +1,4 @@
-package pl.apanowicz.demoapp.domain;
+package pl.apanowicz.demoapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 
 
 public class ProductRequestDto {
@@ -17,38 +16,37 @@ public class ProductRequestDto {
 
     @Valid
     @NotNull(message = "Price cannot be null")
-    private final Price price;
+    private final PriceDto price;
 
     @Valid
-    private Image image;
+    private ImageDto image;
 
     @JsonCreator
     public ProductRequestDto(@JsonProperty("name") String name,
-                             @JsonProperty("price") Price price,
-                             @JsonProperty(value = "image", required = false) Image image) {
+                             @JsonProperty("price") PriceDto price,
+                             @JsonProperty("image") ImageDto image) {
         this.name = name;
         this.price = price;
         this.image = image;
-
     }
 
-    public ProductRequestDto(String name, Price price) {
+    public ProductRequestDto(@JsonProperty("name") String name,
+                             @JsonProperty("price") PriceDto price) {
         this.name = name;
         this.price = price;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public Price getPrice() {
-        return price;
+    public PriceDto getPrice() {
+        return this.price;
     }
 
-    public Image getImage() {
-        return image;
+    public ImageDto getImage() {
+        return this.image;
     }
-
 
     @Override
     public String toString() {

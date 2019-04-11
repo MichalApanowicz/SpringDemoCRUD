@@ -4,10 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pl.apanowicz.demoapp.domain.*;
+import pl.apanowicz.demoapp.domain.ProductFacade;
+import pl.apanowicz.demoapp.dto.ProductRequestDto;
+import pl.apanowicz.demoapp.dto.ProductResponseDto;
+import pl.apanowicz.demoapp.dto.ProductsResponseDto;
+import pl.apanowicz.demoapp.domain.exceptions.ProductNotFoundException;
+import pl.apanowicz.demoapp.domain.exceptions.ProductValidationException;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 
 @RestController
 @Validated
@@ -27,7 +31,7 @@ class ProductEndpoint {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") String id) throws ProductNotFoundException{
+    ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") String id) throws ProductNotFoundException {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(productFacade.get(id));

@@ -2,7 +2,6 @@ package pl.apanowicz.demoapp.infrastructure;
 
 import org.springframework.stereotype.Component;
 import pl.apanowicz.demoapp.domain.Product;
-import pl.apanowicz.demoapp.domain.ProductResponseDto;
 
 import java.util.HashMap;
 import java.util.List;

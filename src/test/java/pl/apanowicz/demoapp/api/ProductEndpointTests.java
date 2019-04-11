@@ -9,14 +9,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import pl.apanowicz.demoapp.DemoappApplicationTests;
-import pl.apanowicz.demoapp.domain.*;
+import pl.apanowicz.demoapp.domain.Currency;
+import pl.apanowicz.demoapp.domain.ProductFacade;
+import pl.apanowicz.demoapp.domain.exceptions.ProductNotFoundException;
+import pl.apanowicz.demoapp.dto.*;
 
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ProductEndpointTests extends DemoappApplicationTests {
@@ -24,8 +24,8 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Autowired
     ProductFacade productFacade;
 
-    private final Price samplePrice = new Price(100, Currency.PLN);
-    private final Image sampleImage= new Image("http://apanowi.cz/image1");
+    private final PriceDto samplePrice = new PriceDto(100, Currency.PLN);
+    private final ImageDto sampleImage= new ImageDto("http://apanowi.cz/image1");
 
     @Test
     public void shouldGetExistingProduct() {
@@ -116,7 +116,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldUpdateProductPrice() {
         ProductResponseDto createdProduct = productFacade.create(new ProductRequestDto("nowyProdukt", samplePrice));
-        Price newPrice = new Price(200, Currency.EUR);
+        PriceDto newPrice = new PriceDto(200, Currency.EUR);
         final ProductRequestDto updatedProductRequest = new ProductRequestDto("nowyProdukt", newPrice);
 
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(
@@ -134,7 +134,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldUpdateProductImage() {
         ProductResponseDto createdProduct = productFacade.create(new ProductRequestDto("nowyProdukt", samplePrice));
-        Image newImage = new Image("https://apanowi.cz/xxx/100");
+        ImageDto newImage = new ImageDto("https://apanowi.cz/xxx/100");
         final ProductRequestDto updatedProductRequest = new ProductRequestDto("nowyProdukt", samplePrice, newImage);
 
         ResponseEntity<ProductResponseDto> updateResult = httpClient.exchange(

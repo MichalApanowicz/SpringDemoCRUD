@@ -1,4 +1,4 @@
-package pl.apanowicz.demoapp.domain;
+package pl.apanowicz.demoapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

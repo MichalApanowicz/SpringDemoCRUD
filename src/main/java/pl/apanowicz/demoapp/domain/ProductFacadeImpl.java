@@ -1,6 +1,10 @@
 package pl.apanowicz.demoapp.domain;
 
 import org.springframework.stereotype.Component;
+import pl.apanowicz.demoapp.dto.ProductRequestDto;
+import pl.apanowicz.demoapp.dto.ProductResponseDto;
+import pl.apanowicz.demoapp.dto.ProductsResponseDto;
+import pl.apanowicz.demoapp.domain.exceptions.ProductNotFoundException;
 import pl.apanowicz.demoapp.infrastructure.ProductRepository;
 
 import java.time.LocalDateTime;
@@ -43,7 +47,7 @@ class ProductFacadeImpl implements ProductFacade {
     }
 
     @Override
-    public ProductResponseDto get(String id) throws ProductNotFoundException{
+    public ProductResponseDto get(String id) throws ProductNotFoundException {
         Product product = productRepository.findById(id);
         if(product==null) {
             throw new ProductNotFoundException(id);

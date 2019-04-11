@@ -1,20 +1,21 @@
-package pl.apanowicz.demoapp.domain;
+package pl.apanowicz.demoapp.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import pl.apanowicz.demoapp.domain.Product;
 
 public class ProductResponseDto {
 
     private final String id;
     private final String name;
-    private final Price price;
-    private final Image image;
+    private final PriceDto price;
+    private final ImageDto image;
 
     @JsonCreator
     public ProductResponseDto(@JsonProperty("id") String id,
                               @JsonProperty("name") String name,
-                              @JsonProperty("price") Price price,
-                              @JsonProperty("image") Image image) {
+                              @JsonProperty("price") PriceDto price,
+                              @JsonProperty("image") ImageDto image) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -25,8 +26,8 @@ public class ProductResponseDto {
     public ProductResponseDto(Product product) {
         this.id = product.getId();
         this.name = product.getName();
-        this.price = product.getPrice();
-        this.image = product.getImage();
+        this.price = new PriceDto(product.getPrice());
+        this.image = new ImageDto(product.getImage());
     }
 
     public String getId() {
@@ -37,11 +38,11 @@ public class ProductResponseDto {
         return name;
     }
 
-    public Price getPrice() {
+    public PriceDto getPrice() {
         return price;
     }
 
-    public Image getImage() {
+    public ImageDto getImage() {
         return image;
     }
 }
