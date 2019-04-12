@@ -26,7 +26,11 @@ class ProductFacadeImpl implements ProductFacade {
     public ProductResponseDto create(ProductRequestDto productRequest){
         String id = UUID.randomUUID().toString();
         LocalDateTime createdAt = LocalDateTime.now();
-        Product product = new Product(id, createdAt, productRequest);
+        Product product = new Product.Builder(id, productRequest.getName(), createdAt)
+                .withImage(new Image(productRequest.getImage()))
+                .withPrice(new Price(productRequest.getPrice()))
+                .withTagsFromDto(productRequest.getTags())
+                .build();
 
         productRepository.save(product);
 
@@ -47,11 +51,23 @@ class ProductFacadeImpl implements ProductFacade {
     }
 
     @Override
+    public ProductsResponseDto getAllWithTag(String tag) throws ProductNotFoundException {
+        List<ProductResponseDto> products = productRepository
+                .findAllWithTag(tag)
+                .stream()
+                .map(x -> new ProductResponseDto(x))
+                .collect(Collectors.toList());
+
+        return new ProductsResponseDto(products);
+    }
+
+    @Override
     public ProductResponseDto get(String id) throws ProductNotFoundException {
         Product product = productRepository.findById(id);
         if(product==null) {
             throw new ProductNotFoundException(id);
         }
+
         return new ProductResponseDto(product);
     }
 
@@ -61,7 +77,11 @@ class ProductFacadeImpl implements ProductFacade {
         if(product==null) {
             throw new ProductNotFoundException(id);
         }
-        Product updatedProduct = new Product(id, product.getCreatedAt(), productRequest);
+        Product updatedProduct = new Product.Builder(id, productRequest.getName(), product.getCreatedAt())
+                .withImage(new Image(productRequest.getImage()))
+                .withPrice(new Price(productRequest.getPrice()))
+                .withTagsFromDto(productRequest.getTags())
+                .build();
         productRepository.update(updatedProduct);
         return new ProductResponseDto(updatedProduct);
     }

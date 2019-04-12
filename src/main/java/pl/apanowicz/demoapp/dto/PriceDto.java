@@ -19,7 +19,8 @@ public final class PriceDto {
     private Currency currency;
 
     @JsonCreator
-    public PriceDto(double amount, Currency currency) {
+    public PriceDto(@JsonProperty("amount") double amount,
+                    @JsonProperty("currency") Currency currency) {
         this.amount = amount;
         this.currency = currency;
     }
@@ -38,19 +39,24 @@ public final class PriceDto {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PriceDto that = (PriceDto) o;
-        return Objects.equals(currency, that.currency) &&
-                Objects.equals(amount, that.amount);
-    }
-
-    @Override
     public String toString() {
         return "PriceDto{" +
                 "amount='" + amount + '\'' +
                 ", currency='" + currency + '\'' +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currency);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PriceDto that = (PriceDto) o;
+        return Objects.equals(amount, that.amount) &&
+                Objects.equals(currency, that.currency);
     }
 }
