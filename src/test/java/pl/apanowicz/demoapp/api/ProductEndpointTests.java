@@ -45,7 +45,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
     @Test
     public void shouldReturnExistingProductsByTag() {
         productFacade.create(new ProductRequestDto("product1", samplePrice, sampleImage, Arrays.asList(new TagDto("jeden"))));
-        productFacade.create(new ProductRequestDto("product2", samplePrice, sampleImage, Arrays.asList(new TagDto("dwa"))));
+        productFacade.create(new ProductRequestDto("product2", samplePrice, sampleImage, Arrays.asList(new TagDto("dwa"), new TagDto("cztery"))));
         productFacade.create(new ProductRequestDto("product3", samplePrice, sampleImage, Arrays.asList(new TagDto("dwa"))));
         productFacade.create(new ProductRequestDto("product4", samplePrice, sampleImage, Arrays.asList(new TagDto("trzy"))));
 
@@ -55,8 +55,9 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
         assertThat(result.getStatusCodeValue()).isEqualTo(200);
         assertThat(result.getBody().getProducts().size()).isEqualTo(2);
-        assertThat(result.getBody().getProducts()
-                .stream().map(p -> p.getName()).collect(Collectors.toList())).isEqualTo(Arrays.asList("product2", "product3"));
+        assertThat(result.getBody().getProducts().stream().map(p -> p.getName()).collect(Collectors.toList())
+                .containsAll(Arrays.asList("product2", "product3")))
+                .isTrue();
     }
 
     @Test
