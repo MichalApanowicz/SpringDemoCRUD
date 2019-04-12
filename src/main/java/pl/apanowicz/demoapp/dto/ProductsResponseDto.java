@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProductsResponseDto {
 
@@ -18,4 +19,12 @@ public class ProductsResponseDto {
         return products;
     }
 
+    @Override
+    public String toString() {
+        return "ProductResponseDto{" +
+                products.stream()
+                        .map(p -> p.toString())
+                        .collect(Collectors.joining(", ")) +
+                '}';
+    }
 }

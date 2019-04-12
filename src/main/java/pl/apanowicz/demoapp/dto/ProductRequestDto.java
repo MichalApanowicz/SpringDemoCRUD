@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 
 public class ProductRequestDto {
@@ -21,19 +22,17 @@ public class ProductRequestDto {
     @Valid
     private ImageDto image;
 
+    private List<TagDto> tags;
+
     @JsonCreator
     public ProductRequestDto(@JsonProperty("name") String name,
                              @JsonProperty("price") PriceDto price,
-                             @JsonProperty("image") ImageDto image) {
+                             @JsonProperty("image") ImageDto image,
+                             @JsonProperty("tags") List<TagDto> tags) {
         this.name = name;
         this.price = price;
         this.image = image;
-    }
-
-    public ProductRequestDto(@JsonProperty("name") String name,
-                             @JsonProperty("price") PriceDto price) {
-        this.name = name;
-        this.price = price;
+        this.tags = tags;
     }
 
     public String getName() {
@@ -48,12 +47,17 @@ public class ProductRequestDto {
         return this.image;
     }
 
+    public List<TagDto> getTags() {
+        return this.tags;
+    }
+
     @Override
     public String toString() {
         return "ProductRequestDto{" +
                 "name='" + name + '\'' +
-                "price='" + price.toString() + '\'' +
-                "image='" + image.toString() + '\'' +
+                ", price='" + price + '\'' +
+                ", image='" + image + '\'' +
+                ", tags=" + tags +
                 '}';
     }
 }

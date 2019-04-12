@@ -11,6 +11,8 @@ public interface ProductRepository {
 
     List<Product> findAll();
 
+    List<Product> findAllWithTag(String tag);
+
     void update(Product product);
 
     void removeById(String id);

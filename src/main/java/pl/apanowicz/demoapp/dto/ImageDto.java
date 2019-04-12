@@ -29,17 +29,22 @@ public final class ImageDto {
     }
 
     @Override
+    public String toString() {
+        return "ImageDto{" +
+                "url='" + url + '\'' +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ImageDto that = (ImageDto) o;
         return Objects.equals(url, that.url);
-    }
-
-    @Override
-    public String toString() {
-        return "ImageDto{" +
-                "url='" + url + '\'' +
-                '}';
     }
 }

@@ -2,10 +2,12 @@ package pl.apanowicz.demoapp.infrastructure;
 
 import org.springframework.stereotype.Component;
 import pl.apanowicz.demoapp.domain.Product;
+import pl.apanowicz.demoapp.domain.Tag;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 class InMemoryProductRepository implements ProductRepository{
@@ -25,6 +27,14 @@ class InMemoryProductRepository implements ProductRepository{
     @Override
     public List<Product> findAll() {
         return List.copyOf(products.values());
+    }
+
+    @Override
+    public List<Product> findAllWithTag(String tag) {
+        return products.values()
+                .stream()
+                .filter(p -> p.getTags().contains(new Tag(tag)))
+                .collect(Collectors.toList());
     }
 
     @Override

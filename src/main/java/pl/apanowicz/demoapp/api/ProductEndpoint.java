@@ -5,11 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.apanowicz.demoapp.domain.ProductFacade;
+import pl.apanowicz.demoapp.domain.exceptions.ProductNotFoundException;
+import pl.apanowicz.demoapp.domain.exceptions.ProductValidationException;
 import pl.apanowicz.demoapp.dto.ProductRequestDto;
 import pl.apanowicz.demoapp.dto.ProductResponseDto;
 import pl.apanowicz.demoapp.dto.ProductsResponseDto;
-import pl.apanowicz.demoapp.domain.exceptions.ProductNotFoundException;
-import pl.apanowicz.demoapp.domain.exceptions.ProductValidationException;
 
 import javax.validation.Valid;
 
@@ -24,7 +24,12 @@ class ProductEndpoint {
     }
 
     @GetMapping
-    ResponseEntity<ProductsResponseDto> getAllProducts() {
+    ResponseEntity<ProductsResponseDto> getProducts(@RequestParam(value="tag", required = false) String tag) {
+        if(tag != null && !tag.isBlank()){
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(productFacade.getAllWithTag(tag));
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(productFacade.getAll());
