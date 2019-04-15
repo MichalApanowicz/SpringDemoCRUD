@@ -33,7 +33,7 @@ class InMemoryProductRepository implements ProductRepository{
     public List<Product> findAllWithTag(String tag) {
         return products.values()
                 .stream()
-                .filter(p -> p.getTags().contains(new Tag(tag)))
+                .filter(p -> p.getTags() != null && p.getTags().contains(new Tag(tag)))
                 .collect(Collectors.toList());
     }
 

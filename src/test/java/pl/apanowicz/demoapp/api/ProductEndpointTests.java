@@ -44,7 +44,7 @@ public class ProductEndpointTests extends DemoappApplicationTests {
 
     @Test
     public void shouldReturnExistingProductsByTag() {
-        productFacade.create(new ProductRequestDto("product1", samplePrice, sampleImage, Arrays.asList(new TagDto("jeden"))));
+        productFacade.create(new ProductRequestDto("product1", samplePrice, sampleImage, Arrays.asList((TagDto)null)));
         productFacade.create(new ProductRequestDto("product2", samplePrice, sampleImage, Arrays.asList(new TagDto("dwa"), new TagDto("cztery"))));
         productFacade.create(new ProductRequestDto("product3", samplePrice, sampleImage, Arrays.asList(new TagDto("dwa"))));
         productFacade.create(new ProductRequestDto("product4", samplePrice, sampleImage, Arrays.asList(new TagDto("trzy"))));
