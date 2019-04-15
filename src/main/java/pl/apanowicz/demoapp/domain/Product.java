@@ -115,6 +115,7 @@ public final class Product {
         public Builder withTagsFromDto(List<TagDto> tags) {
             if (tags != null && !tags.isEmpty()) {
                 this.tags = tags.stream()
+                        .filter(t -> t != null)
                         .map(t -> new Tag(t.getName()))
                         .collect(Collectors.toList());
             } else {
