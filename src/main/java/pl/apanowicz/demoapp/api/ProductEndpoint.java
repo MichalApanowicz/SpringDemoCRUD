@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @Validated
-@CrossOrigin("*")
+@CrossOrigin
 @RequestMapping("api/v1/products")
 class ProductEndpoint {
 
